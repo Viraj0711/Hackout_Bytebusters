@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { AuthModal } from '../components/Auth/AuthModal';
+import { Footer } from '../components/Layout/Footer';
 
 const Landing = () => {
   const { user } = useAuth();
@@ -355,6 +356,9 @@ const Landing = () => {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
       />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

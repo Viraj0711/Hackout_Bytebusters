@@ -233,7 +233,7 @@ const Settings = () => {
                         value={settings.profile.role}
                         onChange={(e) => setSettings(prev => ({
                           ...prev,
-                          profile: { ...prev.profile, role: e.target.value }
+                          profile: { ...prev.profile, role: e.target.value as 'planner' | 'energy_company' | 'analyst' | 'admin' }
                         }))}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       >
