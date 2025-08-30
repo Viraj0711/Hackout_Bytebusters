@@ -1,4 +1,5 @@
 # Green Hydrogen Ecosystem Platform
+*By Team Bytebusters*
 
 An interactive web platform that visualizes and optimizes the green hydrogen ecosystem—including plants, pipelines, storage sites, distribution hubs, and relevant renewable energy resources—on a geographic map. The solution empowers planners, energy companies, and project developers to make informed decisions about site selection and optimize investments using real data and computational modeling.
 
@@ -123,4 +124,4 @@ This project is part of Hackout25 and is intended for educational and demonstrat
 
 ---
 
-Built with ❤️ for sustainable energy infrastructure planning
+Built with ❤️ by **Team Bytebusters** for sustainable energy infrastructure planning
