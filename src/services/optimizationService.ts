@@ -76,11 +76,20 @@ export class OptimizationService {
       }
 
       // Find nearest renewable source
-      const nearestRenewable: RenewableSourceWithDistance = allRenewableSources.reduce((nearest, source) => {
+      let nearestRenewable: RenewableSourceWithDistance = { 
+        lat: 0, 
+        lng: 0, 
+        capacity: 0, 
+        type: '', 
+        distance: Infinity 
+      };
+      
+      for (const source of allRenewableSources) {
         const distance = this.calculateDistance(baseLatitude, baseLongitude, source.lat, source.lng);
-        const sourceWithDistance: RenewableSourceWithDistance = { ...source, distance };
-        return distance < nearest.distance ? sourceWithDistance : nearest;
-      }, { lat: 0, lng: 0, capacity: 0, type: '', distance: Infinity } as RenewableSourceWithDistance);
+        if (distance < nearestRenewable.distance) {
+          nearestRenewable = { ...source, distance };
+        }
+      }
 
       // Find nearest demand center
       const nearestDemand: DemandCenterWithDistance = demandCenters.reduce((nearest, center) => {
