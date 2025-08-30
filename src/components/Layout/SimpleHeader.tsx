@@ -1,10 +1,13 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Zap, Menu, User, Settings, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { NotificationCenter } from './NotificationCenter';
+import { useAuth } from '../../context/AuthContext';
 
 export function SimpleHeader() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -53,65 +56,93 @@ export function SimpleHeader() {
 
           {/* User Menu & Mobile Toggle */}
           <div className="flex items-center space-x-4">
-            {/* Notification Center */}
-            <NotificationCenter />
+            {/* Notification Center - only show when logged in */}
+            {user && <NotificationCenter />}
 
-            {/* Profile Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 rounded-lg p-2"
-              >
-                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-sm font-medium">Admin User</span>
-              </button>
-
-              {/* Profile Dropdown Menu */}
-              {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                  <div className="p-2">
-                    <Link
-                      to="/profile"
-                      className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      <User className="w-4 h-4" />
-                      <span>Profile</span>
-                    </Link>
-                    <Link
-                      to="/settings"
-                      className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      <Settings className="w-4 h-4" />
-                      <span>Settings</span>
-                    </Link>
-                    <hr className="my-2" />
-                    <button
-                      className="flex items-center space-x-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 rounded-lg w-full text-left"
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        // Add logout logic here
-                        console.log('Logout clicked');
-                      }}
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign out</span>
-                    </button>
+            {/* Authentication State Conditional Rendering */}
+            {user ? (
+              /* Profile Dropdown for logged in users */
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 rounded-lg p-2"
+                >
+                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" />
                   </div>
-                </div>
-              )}
+                  <span className="text-sm font-medium">{user?.full_name || user?.email?.split('@')[0] || 'User'}</span>
+                </button>
 
-              {/* Backdrop */}
-              {isProfileOpen && (
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setIsProfileOpen(false)}
-                />
-              )}
-            </div>
+                {/* Profile Dropdown Menu */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                    <div className="p-2">
+                      <Link
+                        to="/profile"
+                        className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <User className="w-4 h-4" />
+                        <span>Profile</span>
+                      </Link>
+                      <Link
+                        to="/settings"
+                        className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Settings className="w-4 h-4" />
+                        <span>Settings</span>
+                      </Link>
+                      <hr className="my-2" />
+                      <button
+                        className="flex items-center space-x-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 rounded-lg w-full text-left"
+                        onClick={async () => {
+                          setIsProfileOpen(false);
+                          try {
+                            await signOut();
+                            // Navigate to landing page after sign out
+                            navigate('/');
+                          } catch (error) {
+                            console.error('Sign out error:', error);
+                            // Force navigation even if sign out fails
+                            navigate('/');
+                          }
+                        }}
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Sign out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Backdrop */}
+                {isProfileOpen && (
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsProfileOpen(false)}
+                  />
+                )}
+              </div>
+            ) : (
+              /* Authentication buttons for guests - only show on non-landing pages */
+              location.pathname !== '/' && (
+                <div className="hidden md:flex items-center space-x-3">
+                  <Link
+                    to="/signin"
+                    className="text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg transition-colors font-medium"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )
+            )}
             
             {/* Mobile menu button */}
             <button

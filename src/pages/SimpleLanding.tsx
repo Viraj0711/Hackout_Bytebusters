@@ -8,7 +8,8 @@ import {
   Cpu,
   ArrowRight,
   Users,
-  Leaf
+  Leaf,
+  LogIn
 } from 'lucide-react';
 
 const Landing = () => {
@@ -41,10 +42,11 @@ const Landing = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link 
-                to="/dashboard"
+              <Link
+                to="/signin"
                 className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-8 py-4 rounded-xl font-semibold flex items-center hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               >
+                <LogIn className="w-5 h-5 mr-2" />
                 Get Started
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
@@ -54,6 +56,24 @@ const Landing = () => {
                 className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-green-500 hover:text-green-600 transition-all duration-300"
               >
                 View Demo
+              </Link>
+            </div>
+            
+            {/* Auth Links */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-6 text-sm">
+              <span className="text-gray-500">Already have an account?</span>
+              <Link 
+                to="/signin"
+                className="text-green-600 hover:text-green-700 font-medium transition-colors"
+              >
+                Sign In
+              </Link>
+              <span className="text-gray-400 hidden sm:inline">•</span>
+              <Link 
+                to="/signup"
+                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                Create Account
               </Link>
             </div>
           </div>

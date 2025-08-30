@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { SimpleHeader } from './components/Layout/SimpleHeader';
+import { AuthProvider } from './context/AuthContext';
 
 // Pages
 import Landing from './pages/SimpleLanding';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
 import SafeDashboard from './pages/SafeDashboard';
 import SimpleAssets from './pages/SimpleAssets';
 import Map from './pages/Map';
@@ -23,12 +26,15 @@ function App() {
   try {
     
     return (
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <SimpleHeader />
-          <main>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            <SimpleHeader />
+            <main>
             <Routes>
               <Route path="/" element={<Landing />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignUp />} />
               <Route path="/dashboard" element={<SafeDashboard />} />
               <Route path="/assets" element={<SimpleAssets />} />
               <Route path="/analytics" element={<SafeAnalytics />} />
@@ -48,6 +54,7 @@ function App() {
           <Toaster position="top-right" />
         </div>
       </Router>
+      </AuthProvider>
     );
   } catch (error) {
     console.error('Error in App component:', error);
