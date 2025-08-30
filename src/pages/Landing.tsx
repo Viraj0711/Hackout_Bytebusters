@@ -16,8 +16,7 @@ import {
   Factory,
   Wind,
   ChevronDown,
-  Star,
-  Play
+  Star
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { AuthModal } from '../components/Auth/AuthModal';
@@ -145,11 +144,6 @@ const Landing = () => {
                   <ArrowRight className="w-5 h-5" />
                 </button>
               )}
-              
-              <button className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-4 rounded-xl text-lg font-semibold flex items-center space-x-3 transition-colors bg-white">
-                <Play className="w-5 h-5" />
-                <span>Watch Demo</span>
-              </button>
             </div>
           </div>
         </div>
@@ -336,13 +330,6 @@ const Landing = () => {
                 <ArrowRight className="w-5 h-5" />
               </button>
             )}
-            
-            <Link
-              to="/dashboard"
-              className="border-2 border-white hover:bg-white hover:text-green-600 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300"
-            >
-              Explore Demo
-            </Link>
           </div>
           
           <p className="text-green-100 mt-8 text-sm">
