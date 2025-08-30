@@ -84,10 +84,10 @@ const Map = () => {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 flex items-center">
                   <MapIcon className="w-6 h-6 mr-2 text-green-500" />
-                  Interactive Map
+                  Global Hydrogen Infrastructure Map
                 </h1>
                 <p className="text-gray-600 text-sm">
-                  Explore the green hydrogen ecosystem infrastructure
+                  Explore the worldwide green hydrogen ecosystem infrastructure
                 </p>
               </div>
               
@@ -96,7 +96,7 @@ const Map = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search location..."
+                  placeholder="Search global locations..."
                   value={searchLocation}
                   onChange={(e) => setSearchLocation(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent w-64"

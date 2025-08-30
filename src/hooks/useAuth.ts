@@ -22,7 +22,7 @@ export function useAuth() {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session?.user) {
         await fetchUserProfile(session.user);
@@ -37,6 +37,7 @@ export function useAuth() {
 
   const fetchUserProfile = async (authUser: SupabaseUser) => {
     try {
+      // Try to fetch user profile from user_profiles table
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -44,25 +45,29 @@ export function useAuth() {
         .single();
 
       if (error) {
-        // Create profile if it doesn't exist
-        const newProfile = {
+        // If user_profiles table doesn't exist or user profile doesn't exist,
+        // create a simple user object from auth data
+        console.log('User profiles table not found or user profile missing, using auth data');
+        const simpleUser: User = {
           id: authUser.id,
           email: authUser.email!,
-          role: 'analyst' as const,
+          role: 'analyst', // Default role
+          created_at: new Date().toISOString(),
         };
-        
-        const { data: createdProfile } = await supabase
-          .from('user_profiles')
-          .insert(newProfile)
-          .select()
-          .single();
-
-        setUser(createdProfile || { ...newProfile, created_at: new Date().toISOString() });
+        setUser(simpleUser);
       } else {
         setUser(data);
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.log('Error fetching user profile, falling back to auth data:', error);
+      // Fallback to simple user object from auth data
+      const simpleUser: User = {
+        id: authUser.id,
+        email: authUser.email!,
+        role: 'analyst', // Default role
+        created_at: new Date().toISOString(),
+      };
+      setUser(simpleUser);
     } finally {
       setLoading(false);
     }
@@ -83,12 +88,17 @@ export function useAuth() {
     });
 
     if (data.user && !error) {
-      // Create user profile
-      await supabase.from('user_profiles').insert({
-        id: data.user.id,
-        email,
-        role,
-      });
+      // Try to create user profile, but don't fail if table doesn't exist
+      try {
+        await supabase.from('user_profiles').insert({
+          id: data.user.id,
+          email,
+          role,
+        });
+      } catch (profileError) {
+        console.log('Could not create user profile (table may not exist):', profileError);
+        // This is fine, we'll use the fallback user object
+      }
     }
 
     return { data, error };

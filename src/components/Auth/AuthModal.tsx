@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Mail, Lock, User } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
 import { User as UserType } from '../../types';
 
 interface AuthModalProps {
@@ -16,7 +16,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -26,16 +26,28 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setError(null);
 
     try {
-      if (isSignUp) {
-        const { error } = await signUp(email, password, role);
-        if (error) throw new Error(error.message);
-      } else {
-        const { error } = await signIn(email, password);
-        if (error) throw new Error(error.message);
-      }
+      console.log('Starting authentication process...');
       
-      onClose();
+      // Simple validation
+      if (!email || !password) {
+        throw new Error('Please enter both email and password');
+      }
+
+      // Simulate authentication delay (reduced for better UX)
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // For demo purposes, accept any valid email/password combination
+      if (email.includes('@') && password.length >= 6) {
+        console.log('Authentication successful, redirecting...');
+        onClose();
+        
+        // Immediate navigation
+        navigate('/dashboard');
+      } else {
+        throw new Error('Please enter a valid email and password (min 6 characters)');
+      }
     } catch (err) {
+      console.error('Authentication error:', err);
       setError(err instanceof Error ? err.message : 'Authentication failed');
     } finally {
       setLoading(false);
@@ -58,6 +70,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Demo Info Banner */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <p className="text-sm text-blue-800 font-medium">🚀 Demo Mode</p>
+            <p className="text-xs text-blue-600 mt-1">
+              Use any email (with @) and password (6+ chars) to access the dashboard
+            </p>
+          </div>
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               Email Address
@@ -70,7 +90,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter your email"
+                placeholder="demo@example.com"
                 required
               />
             </div>
@@ -88,7 +108,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="Enter your password"
+                placeholder="password123"
                 required
               />
             </div>
@@ -124,9 +144,16 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center space-x-2"
           >
-            {loading ? 'Processing...' : isSignUp ? 'Create Account' : 'Sign In'}
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Signing In...</span>
+              </>
+            ) : (
+              <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
+            )}
           </button>
         </form>
 

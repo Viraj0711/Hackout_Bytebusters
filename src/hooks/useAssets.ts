@@ -1,15 +1,25 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Asset, FilterState } from '../types';
+import { sampleAssets } from '../data/sampleAssets';
 
 export function useAssets() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAssets = async (filters?: FilterState) => {
+  const fetchAssets = async (_filters?: FilterState) => {
     try {
       setLoading(true);
+      
+      // For demo mode, immediately use sample data
+      console.log('Loading assets - using sample data for demo');
+      setAssets(sampleAssets);
+      setLoading(false);
+      return;
+
+      // Original Supabase code (commented out for demo)
+      /*
       let query = supabase.from('assets').select('*');
 
       if (filters?.assetTypes.length) {
@@ -30,9 +40,19 @@ export function useAssets() {
 
       const { data, error } = await query.order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setAssets(data || []);
+      if (error) {
+        console.log('Database error, using sample data:', error.message);
+        setAssets(sampleAssets);
+      } else if (!data || data.length === 0) {
+        console.log('No data in database, using sample data');
+        setAssets(sampleAssets);
+      } else {
+        setAssets(data);
+      }
+      */
     } catch (err) {
+      console.log('Error fetching assets, using sample data:', err);
+      setAssets(sampleAssets);
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
