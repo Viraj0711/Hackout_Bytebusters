@@ -1,7 +1,6 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { Asset, AnalyticsData } from '../../types';
-import { Building, MapPin, Activity, Zap, TrendingUp, Factory, Battery, Truck, Users, Leaf } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Asset } from '../../types';
+import { Building, MapPin, Zap, TrendingUp, Factory, Battery, Truck, Users, Leaf } from 'lucide-react';
 
 interface StatsPanelProps {
   assets: Asset[];

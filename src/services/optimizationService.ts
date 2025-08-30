@@ -102,7 +102,7 @@ export class OptimizationService {
       );
 
       // Advanced scoring algorithm
-      let score = this.calculateOptimizationScore(
+      const score = this.calculateOptimizationScore(
         constraints,
         nearestRenewable,
         nearestDemand,
@@ -253,7 +253,7 @@ export class OptimizationService {
     nearestDemand: DemandCenterWithDistance,
     infrastructureSynergy: number
   ): number {
-    let baseCost = constraints.minCapacity * 1.5; // Base cost per unit capacity
+    const baseCost = constraints.minCapacity * 1.5; // Base cost per unit capacity
     
     // Distance cost factors
     const renewableDistanceCost = nearestRenewable.distance * 0.5;

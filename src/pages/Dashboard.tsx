@@ -26,11 +26,11 @@ const Dashboard = () => {
     );
   }
 
-  const handleAssetSelect = (asset: Asset | null) => {
+  const handleAssetSelect = (_asset: Asset | null) => {
     // Handle asset selection
   };
 
-  const handleMapClick = (lat: number, lng: number) => {
+  const handleMapClick = (_lat: number, _lng: number) => {
     // Handle map click
   };
   const quickStats = [

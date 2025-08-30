@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Asset } from '../../types';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default markers in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -19,7 +19,7 @@ interface MapViewProps {
   onMapClick: (lat: number, lng: number) => void;
 }
 
-const getAssetIcon = (type: Asset['type'], status: Asset['status'], subtype?: string) => {
+const getAssetIcon = (type: Asset['type'], status: Asset['status'], _subtype?: string) => {
   const colors = {
     hydrogen_plant: '#059669', // Green for hydrogen production
     pipeline: '#0ea5e9', // Blue for transport

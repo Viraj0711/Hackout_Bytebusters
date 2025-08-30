@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 interface AssetModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (asset: Omit<Asset, 'id' | 'created_at' | 'updated_at'>) => Promise<any>;
+  onSave: (asset: Omit<Asset, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   editingAsset?: Asset | null;
   initialPosition?: { lat: number; lng: number };
 }
@@ -90,24 +90,23 @@ export function AssetModal({ isOpen, onClose, onSave, editingAsset, initialPosit
         name: formData.name,
         type: formData.type,
         status: formData.status,
-        latitude: formData.latitude,
-        longitude: formData.longitude,
-        capacity: formData.capacity ? parseFloat(formData.capacity) : null,
-        capacity_unit: formData.capacity_unit || null,
+        latitude: parseFloat(formData.latitude.toString()),
+        longitude: parseFloat(formData.longitude.toString()),
+        capacity: formData.capacity ? parseFloat(formData.capacity) : undefined,
+        capacity_unit: formData.capacity_unit,
         owner: formData.owner,
-        description: formData.description || null,
-        regulatory_zone: formData.regulatory_zone || null,
-        cost_estimate: formData.cost_estimate ? parseFloat(formData.cost_estimate) : null,
+        description: formData.description || undefined,
+        regulatory_zone: formData.regulatory_zone || undefined,
+        cost_estimate: formData.cost_estimate ? parseFloat(formData.cost_estimate) : undefined,
         created_by: user.id,
       };
 
-      const { error } = await onSave(assetData);
-      if (error) throw new Error(error);
+      await onSave(assetData);
       
       onClose();
       setFormData({
         name: '',
-        type: 'plant',
+        type: 'hydrogen_plant',
         status: 'planned',
         latitude: 0,
         longitude: 0,
