@@ -25,7 +25,6 @@ import { AuthModal } from '../components/Auth/AuthModal';
 const Landing = () => {
   const { user } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [showFeatures, setShowFeatures] = useState(false);
 
   const features = [
     {
