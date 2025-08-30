@@ -1,18 +1,22 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Zap, Menu, User } from 'lucide-react';
+import { Zap, Menu, User, Settings, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { NotificationCenter } from './NotificationCenter';
 
 export function SimpleHeader() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard' },
-    { path: '/analytics', label: 'Analytics' },
-    { path: '/optimization', label: 'Optimization' },
     { path: '/assets', label: 'Assets' },
     { path: '/map', label: 'Map' },
-    { path: '/settings', label: 'Settings' }
+    { path: '/analytics-enhanced', label: 'Analytics' },
+    { path: '/optimization-advanced', label: 'Optimization' },
+    { path: '/monitoring', label: 'Monitoring' },
+    { path: '/settings', label: 'Settings' },
+    { path: '/admin', label: 'Admin' }
   ];
 
   return (
@@ -49,13 +53,65 @@ export function SimpleHeader() {
 
           {/* User Menu & Mobile Toggle */}
           <div className="flex items-center space-x-4">
-            <Link
-              to="/profile"
-              className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors"
-            >
-              <User className="w-5 h-5" />
-              <span className="text-sm font-medium">Profile</span>
-            </Link>
+            {/* Notification Center */}
+            <NotificationCenter />
+
+            {/* Profile Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 rounded-lg p-2"
+              >
+                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm font-medium">Admin User</span>
+              </button>
+
+              {/* Profile Dropdown Menu */}
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <div className="p-2">
+                    <Link
+                      to="/profile"
+                      className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      <span>Profile</span>
+                    </Link>
+                    <Link
+                      to="/settings"
+                      className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Settings</span>
+                    </Link>
+                    <hr className="my-2" />
+                    <button
+                      className="flex items-center space-x-2 px-3 py-2 text-sm text-red-700 hover:bg-red-50 rounded-lg w-full text-left"
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        // Add logout logic here
+                        console.log('Logout clicked');
+                      }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Backdrop */}
+              {isProfileOpen && (
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsProfileOpen(false)}
+                />
+              )}
+            </div>
             
             {/* Mobile menu button */}
             <button
