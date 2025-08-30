@@ -59,6 +59,17 @@ const Optimization = () => {
           longitude: 77.1025,
           justification: 'Strategic location with excellent renewable energy access and proximity to major demand centers',
           requirements: ['Environmental clearance', 'Land acquisition', 'Grid connection'],
+          score: 92,
+          reasoning: 'Optimal location based on renewable energy proximity, demand centers, and infrastructure synergy',
+          estimated_cost: 150,
+          renewable_proximity: 5.2,
+          demand_proximity: 12.8,
+          environmental_impact: 8,
+          regulatory_compliance: true,
+          infrastructure_synergy: 85,
+          risk_assessment: 'low',
+          recommended_capacity: 50000,
+          payback_period: 7,
           created_at: new Date().toISOString(),
           created_by: 'optimization_engine'
         },
@@ -74,6 +85,17 @@ const Optimization = () => {
           longitude: 75.7873,
           justification: 'Current facility operating at peak efficiency with room for expansion',
           requirements: ['Equipment upgrade', 'Regulatory approval', 'Additional workforce'],
+          score: 87,
+          reasoning: 'Existing facility with proven track record and expansion potential',
+          estimated_cost: 85,
+          renewable_proximity: 8.5,
+          demand_proximity: 6.2,
+          environmental_impact: 7,
+          regulatory_compliance: true,
+          infrastructure_synergy: 95,
+          risk_assessment: 'low',
+          recommended_capacity: 75000,
+          payback_period: 5,
           created_at: new Date().toISOString(),
           created_by: 'optimization_engine'
         },
@@ -89,6 +111,17 @@ const Optimization = () => {
           longitude: 72.8777,
           justification: 'Alternative route reduces distance by 23% while maintaining safety standards',
           requirements: ['Route survey', 'Environmental assessment', 'Construction permits'],
+          score: 79,
+          reasoning: 'Cost-effective route optimization with significant efficiency gains',
+          estimated_cost: 120,
+          renewable_proximity: 15.3,
+          demand_proximity: 18.7,
+          environmental_impact: 6,
+          regulatory_compliance: true,
+          infrastructure_synergy: 70,
+          risk_assessment: 'medium',
+          recommended_capacity: 30000,
+          payback_period: 8,
           created_at: new Date().toISOString(),
           created_by: 'optimization_engine'
         }
@@ -244,37 +277,37 @@ const Optimization = () => {
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                              {rec.title}
+                              {rec.title || 'Untitled Recommendation'}
                             </h3>
-                            <p className="text-gray-600 mb-4">{rec.description}</p>
+                            <p className="text-gray-600 mb-4">{rec.description || 'No description available'}</p>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                               <div className="bg-green-50 p-3 rounded-lg">
                                 <p className="text-sm font-medium text-green-800">Confidence</p>
                                 <p className="text-lg font-bold text-green-600">
-                                  {(rec.confidence * 100).toFixed(1)}%
+                                  {((rec.confidence || 0) * 100).toFixed(1)}%
                                 </p>
                               </div>
                               <div className="bg-blue-50 p-3 rounded-lg">
                                 <p className="text-sm font-medium text-blue-800">Potential Savings</p>
                                 <p className="text-lg font-bold text-blue-600">
-                                  ₹{(rec.potential_savings / 10000000).toFixed(1)}Cr
+                                  ₹{((rec.potential_savings || 0) / 10000000).toFixed(1)}Cr
                                 </p>
                               </div>
                               <div className="bg-orange-50 p-3 rounded-lg">
                                 <p className="text-sm font-medium text-orange-800">Timeline</p>
                                 <p className="text-lg font-bold text-orange-600">
-                                  {rec.implementation_timeline}
+                                  {rec.implementation_timeline || 'TBD'}
                                 </p>
                               </div>
                             </div>
                             <div className="mb-4">
                               <h4 className="font-medium text-gray-900 mb-2">Justification:</h4>
-                              <p className="text-gray-600">{rec.justification}</p>
+                              <p className="text-gray-600">{rec.justification || 'No justification provided'}</p>
                             </div>
                             <div>
                               <h4 className="font-medium text-gray-900 mb-2">Requirements:</h4>
                               <div className="flex flex-wrap gap-2">
-                                {rec.requirements.map((req, index) => (
+                                {(rec.requirements || []).map((req, index) => (
                                   <span
                                     key={index}
                                     className="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800"
@@ -287,14 +320,14 @@ const Optimization = () => {
                           </div>
                           <div className="ml-4">
                             <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
-                              rec.confidence > 0.9 
+                              (rec.confidence || 0) > 0.9 
                                 ? 'bg-green-100 text-green-800'
-                                : rec.confidence > 0.8
+                                : (rec.confidence || 0) > 0.8
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : 'bg-red-100 text-red-800'
                             }`}>
-                              {rec.confidence > 0.9 ? 'High Confidence' :
-                               rec.confidence > 0.8 ? 'Medium Confidence' : 'Low Confidence'}
+                              {(rec.confidence || 0) > 0.9 ? 'High Confidence' :
+                               (rec.confidence || 0) > 0.8 ? 'Medium Confidence' : 'Low Confidence'}
                             </span>
                           </div>
                         </div>

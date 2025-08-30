@@ -49,6 +49,14 @@ export interface OptimizationConstraints {
 
 export interface Recommendation {
   id: string;
+  type?: string; // Type of recommendation (site_selection, capacity_optimization, route_optimization)
+  title?: string; // Title of the recommendation
+  description?: string; // Description of the recommendation
+  confidence?: number; // Confidence level (0-1)
+  potential_savings?: number; // Potential savings in currency
+  implementation_timeline?: string; // Timeline for implementation
+  justification?: string; // Justification for the recommendation
+  requirements?: string[]; // List of requirements
   latitude: number;
   longitude: number;
   score: number;
