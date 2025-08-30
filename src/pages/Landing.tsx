@@ -338,6 +338,46 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Debug Section - Only visible in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <section className="py-16 bg-yellow-50 border-t border-yellow-200">
+          <div className="container mx-auto px-6">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-2xl font-bold text-yellow-800 mb-4">🧪 Development Testing</h2>
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <p className="text-sm text-gray-600 mb-4">Quick access for testing role-based authentication:</p>
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <Link 
+                    to="/admin" 
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Test Admin Access
+                  </Link>
+                  <Link 
+                    to="/profile" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Test Profile Access
+                  </Link>
+                  <Link 
+                    to="/dashboard" 
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Test Dashboard
+                  </Link>
+                </div>
+                {user && (
+                  <div className="mt-4 p-3 bg-gray-100 rounded text-sm">
+                    <p><strong>Current User:</strong> {user.email}</p>
+                    <p><strong>Role:</strong> {user.role}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}

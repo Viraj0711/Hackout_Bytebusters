@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Mail, Lock, User } from 'lucide-react';
 import { User as UserType } from '../../types';
+import { useAuth } from '../../hooks/useAuth';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -17,11 +18,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [error, setError] = useState<string | null>(null);
   
   const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with:', { email, password, passwordLength: password.length });
+    
     setLoading(true);
     setError(null);
 
@@ -30,22 +34,60 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       
       // Simple validation
       if (!email || !password) {
+        console.log('Validation failed: missing email or password');
         throw new Error('Please enter both email and password');
       }
 
-      // Simulate authentication delay (reduced for better UX)
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // For demo purposes, accept any valid email/password combination
-      if (email.includes('@') && password.length >= 6) {
-        console.log('Authentication successful, redirecting...');
-        onClose();
-        
-        // Immediate navigation
-        navigate('/dashboard');
-      } else {
-        throw new Error('Please enter a valid email and password (min 6 characters)');
+      if (!email.includes('@')) {
+        console.log('Validation failed: invalid email format');
+        throw new Error('Please enter a valid email address (must contain @)');
       }
+
+      if (password.length < 6) {
+        console.log('Validation failed: password too short');
+        throw new Error('Password must be at least 6 characters long');
+      }
+
+      console.log('Validation passed, attempting authentication...');
+      
+      let authResult;
+      
+      if (isSignUp) {
+        console.log('Attempting sign up...');
+        authResult = await signUp(email, password, role);
+      } else {
+        console.log('Attempting sign in...');
+        authResult = await signIn(email, password);
+      }
+      
+      if (authResult.error) {
+        console.log('Authentication failed with error:', authResult.error);
+        // Since we're in demo mode and auth will create demo users, 
+        // any error here means something is wrong with our demo setup
+        throw new Error('Authentication failed. Please try again.');
+      }
+      
+      console.log('Authentication successful, closing modal...');
+      onClose();
+      
+      // Wait a moment for user state to update, then redirect based on role
+      setTimeout(() => {
+        // For demo mode, we can check the email to determine role-based redirect
+        const isAdmin = email.toLowerCase().includes('admin') || 
+                       ['admin@energymanager.com', 'admin@company.com', 'administrator@energymanager.com', 'viraj@admin.com', 'test@admin.com'].includes(email.toLowerCase());
+        
+        console.log('Redirecting user based on email:', email, 'isAdmin:', isAdmin);
+        
+        if (isAdmin) {
+          console.log('Redirecting admin user to admin dashboard...');
+          navigate('/admin');
+        } else {
+          console.log('Redirecting regular user to profile...');
+          navigate('/profile');
+        }
+      }, 100);
+      
+      console.log('Navigation completed');
     } catch (err) {
       console.error('Authentication error:', err);
       setError(err instanceof Error ? err.message : 'Authentication failed');
@@ -55,15 +97,28 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-8 w-full max-w-md mx-4 shadow-2xl transform transition-all">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+      onClick={(e) => {
+        // Close modal if clicking on backdrop
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        className="bg-white rounded-xl p-8 w-full max-w-md mx-4 shadow-2xl transform transition-all relative z-[10000] max-h-[90vh] overflow-y-auto"
+        style={{ maxWidth: '28rem', zIndex: 10000 }}
+        onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking on modal content
+      >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">
             {isSignUp ? 'Create Account' : 'Sign In'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
           >
             <X className="w-6 h-6" />
           </button>
@@ -71,11 +126,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Demo Info Banner */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-            <p className="text-sm text-blue-800 font-medium">🚀 Demo Mode</p>
-            <p className="text-xs text-blue-600 mt-1">
-              Use any email (with @) and password (6+ chars) to access the dashboard
-            </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <p className="text-sm text-blue-800 font-bold mb-2">🚀 Demo Mode - Quick Login</p>
+            <div className="text-xs text-blue-700 space-y-1">
+              <p><strong>Admin credentials:</strong></p>
+              <p>• Email: <code className="bg-blue-100 px-1 rounded">admin@test.com</code></p>
+              <p>• Password: <code className="bg-blue-100 px-1 rounded">password123</code></p>
+              <p><strong>User credentials:</strong></p>
+              <p>• Email: <code className="bg-blue-100 px-1 rounded">user@example.com</code></p>
+              <p>• Password: <code className="bg-blue-100 px-1 rounded">password123</code></p>
+              <p className="text-blue-600 mt-2"><em>Any email with @ and 6+ char password works!</em></p>
+            </div>
           </div>
 
           <div>

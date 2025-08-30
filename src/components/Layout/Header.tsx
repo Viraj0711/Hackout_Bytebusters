@@ -10,6 +10,11 @@ export function Header() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Debug logging
+  console.log('Header - Current user:', user);
+  console.log('Header - User role:', user?.role);
+  console.log('Header - Current location:', location.pathname);
+
   const handleSignOut = async () => {
     await signOut();
   };
@@ -20,6 +25,14 @@ export function Header() {
     { name: 'Analytics', href: '/analytics', current: location.pathname === '/analytics' },
     { name: 'Optimization', href: '/optimization', current: location.pathname === '/optimization' },
     { name: 'Map', href: '/map', current: location.pathname === '/map' },
+    // Add admin link for admin users
+    ...(user?.role === 'admin' ? [
+      { name: 'Admin', href: '/admin', current: location.pathname === '/admin' }
+    ] : []),
+    // Add profile link for regular users
+    ...(user && user.role !== 'admin' ? [
+      { name: 'Profile', href: '/profile', current: location.pathname === '/profile' }
+    ] : [])
   ];
 
   const isLandingPage = location.pathname === '/';
