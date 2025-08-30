@@ -22,7 +22,6 @@ import {
   BarChart3, 
   PieChart as PieChartIcon, 
   Activity,
-  Zap,
   Factory,
   Battery,
   Fuel
@@ -44,24 +43,43 @@ const Analytics = () => {
     );
   }
 
-  // Process data for charts
-  const assetTypeData = assets.reduce((acc, asset) => {
-    const key = asset.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  // Process data for charts - use mock data if no assets available
+  const mockAssetTypeData = {
+    'Production Plants': 12,
+    'Storage Facilities': 8,
+    'Pipelines': 15,
+    'Distribution Hubs': 6,
+    'Renewable Sources': 20
+  };
+
+  const mockStatusData = {
+    'Operational': 28,
+    'Under Construction': 15,
+    'Planned': 12,
+    'Maintenance': 6
+  };
+
+  const assetTypeData = assets.length > 0 
+    ? assets.reduce((acc, asset) => {
+        const key = asset.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>)
+    : mockAssetTypeData;
 
   const chartData = Object.entries(assetTypeData).map(([name, count]) => ({
     name,
     count,
-    capacity: Math.floor(Math.random() * 1000) + 100 // Mock capacity data
+    capacity: Math.floor(Math.random() * 1000) + 100
   }));
 
-  const statusData = assets.reduce((acc, asset) => {
-    const key = asset.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const statusData = assets.length > 0
+    ? assets.reduce((acc, asset) => {
+        const key = asset.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>)
+    : mockStatusData;
 
   const pieData = Object.entries(statusData).map(([name, value]) => ({
     name,
@@ -169,7 +187,7 @@ const Analytics = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                 <BarChart3 className="w-5 h-5 mr-2 text-blue-500" />
-                Asset Distribution
+                Infrastructure Distribution
               </h3>
             </div>
             <ResponsiveContainer width="100%" height={300}>
@@ -189,7 +207,7 @@ const Analytics = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center">
                 <PieChartIcon className="w-5 h-5 mr-2 text-purple-500" />
-                Status Distribution
+                Project Status Overview
               </h3>
             </div>
             <ResponsiveContainer width="100%" height={300}>
@@ -204,7 +222,7 @@ const Analytics = () => {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {pieData.map((entry, index) => (
+                  {pieData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -215,7 +233,7 @@ const Analytics = () => {
         </div>
 
         {/* Time Series Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Production Trend */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-6">
@@ -265,6 +283,48 @@ const Analytics = () => {
                 />
               </LineChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Infrastructure Breakdown */}
+        <div className="bg-white rounded-lg shadow-md mb-8">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Infrastructure Breakdown
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Detailed analysis of infrastructure components and their capacity
+            </p>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {chartData.map((item, index) => (
+                <div key={item.name} className="text-center">
+                  <div className="relative">
+                    <div 
+                      className="w-20 h-20 mx-auto rounded-full flex items-center justify-center text-white font-bold text-lg"
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    >
+                      {item.count}
+                    </div>
+                    <div className="absolute -bottom-2 -right-2 bg-gray-100 rounded-full px-2 py-1 text-xs font-medium text-gray-600">
+                      {((item.count / chartData.reduce((sum, d) => sum + d.count, 0)) * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                  <h4 className="mt-4 font-semibold text-gray-900">{item.name}</h4>
+                  <p className="text-sm text-gray-500">{item.capacity} MW</p>
+                  <div className="mt-2 bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="h-2 rounded-full"
+                      style={{ 
+                        backgroundColor: COLORS[index % COLORS.length],
+                        width: `${Math.min((item.capacity / 1000) * 100, 100)}%`
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
