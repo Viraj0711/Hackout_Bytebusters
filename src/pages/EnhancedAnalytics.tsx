@@ -10,22 +10,74 @@ type ViewType = 'overview' | 'production' | 'carbon' | 'costs' | 'utilization';
 
 const EnhancedAnalytics: React.FC = () => {
   const {
+    analytics: _analytics,
     kpiCards,
     chartData,
-    statusData,
-    regionData,
+    statusData: _statusData,
+    regionData: _regionData,
     performanceMetrics,
-    totalProduction,
-    carbonReduction,
-    avgEfficiency,
-    totalGrowth,
     loading,
     refreshAnalytics,
-    exportAnalytics
+    exportData,
+    totalGrowth: _totalGrowth
   } = useAnalytics();
 
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('30d');
   const [selectedView, setSelectedView] = useState<ViewType>('overview');
+
+  // Sample data for missing chart data
+  const energyProductionData = [
+    { date: '2024-01', production: 245, capacity: 300 },
+    { date: '2024-02', production: 278, capacity: 300 },
+    { date: '2024-03', production: 289, capacity: 300 },
+    { date: '2024-04', production: 312, capacity: 350 },
+    { date: '2024-05', production: 298, capacity: 350 },
+    { date: '2024-06', production: 334, capacity: 350 }
+  ];
+
+  const carbonReductionData = [
+    { date: '2024-01', reduction: 1250 },
+    { date: '2024-02', reduction: 1420 },
+    { date: '2024-03', reduction: 1380 },
+    { date: '2024-04', reduction: 1560 },
+    { date: '2024-05', reduction: 1490 },
+    { date: '2024-06', reduction: 1670 }
+  ];
+
+  const costAnalysisData = [
+    { date: '2024-01', operational: 45000, maintenance: 12000, revenue: 78000 },
+    { date: '2024-02', operational: 47000, maintenance: 15000, revenue: 82000 },
+    { date: '2024-03', operational: 44000, maintenance: 11000, revenue: 85000 },
+    { date: '2024-04', operational: 48000, maintenance: 13000, revenue: 89000 },
+    { date: '2024-05', operational: 46000, maintenance: 14000, revenue: 92000 },
+    { date: '2024-06', operational: 45000, maintenance: 12000, revenue: 95000 }
+  ];
+
+  const assetUtilizationData = [
+    { asset: 'Electrolyzer A', utilization: 85 },
+    { asset: 'Electrolyzer B', utilization: 78 },
+    { asset: 'Storage Tank 1', utilization: 92 },
+    { asset: 'Storage Tank 2', utilization: 88 },
+    { asset: 'Fuel Cell 1', utilization: 76 },
+    { asset: 'Fuel Cell 2', utilization: 82 }
+  ];
+
+  // Dashboard data for key metrics
+  const dashboardData = {
+    keyMetrics: kpiCards.map(card => ({
+      title: card.title,
+      value: parseFloat(card.value) || 0,
+      unit: '',
+      change: parseFloat(card.change) || 0,
+      icon: '⚡',
+      bgColor: 'bg-green-50',
+      textColor: 'text-green-600'
+    })),
+    assetDistribution: chartData.map(item => ({
+      name: item.name,
+      value: item.count
+    }))
+  };
 
   const timeRangeOptions = [
     { value: '7d', label: 'Last 7 days' },
@@ -101,7 +153,7 @@ const EnhancedAnalytics: React.FC = () => {
                 <Calendar className="w-4 h-4 text-gray-500" />
                 <select
                   value={selectedTimeRange}
-                  onChange={(e) => setSelectedTimeRange(e.target.value as any)}
+                  onChange={(e) => setSelectedTimeRange(e.target.value as TimeRange)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   {timeRangeOptions.map(option => (
@@ -111,7 +163,7 @@ const EnhancedAnalytics: React.FC = () => {
                   ))}\n                </select>
               </div>
               <button
-                onClick={refreshData}
+                onClick={refreshAnalytics}
                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <Activity className="w-4 h-4" />
@@ -134,7 +186,7 @@ const EnhancedAnalytics: React.FC = () => {
               return (
                 <button
                   key={option.value}
-                  onClick={() => setSelectedView(option.value as any)}
+                  onClick={() => setSelectedView(option.value as ViewType)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     selectedView === option.value
                       ? 'bg-white text-green-600 shadow-sm'
@@ -220,7 +272,7 @@ const EnhancedAnalytics: React.FC = () => {
                       outerRadius={100}
                       label={(entry) => `${entry.name}: ${entry.value}`}
                     >
-                      {dashboardData.assetDistribution.map((entry, index) => (
+                      {dashboardData.assetDistribution.map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
                       ))}
                     </Pie>
@@ -235,13 +287,13 @@ const EnhancedAnalytics: React.FC = () => {
                   {performanceMetrics.map((metric, index) => (
                     <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div>
-                        <p className="font-medium text-gray-900">{metric.name}</p>
-                        <p className="text-sm text-gray-600">{metric.description}</p>
+                        <p className="font-medium text-gray-900">{metric.region}</p>
+                        <p className="text-sm text-gray-600">{metric.assets} assets</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-gray-900">{formatNumber(metric.value, metric.unit)}</p>
-                        <p className={`text-sm ${getChangeColor(metric.change)}`}>
-                          {metric.change > 0 ? '+' : ''}{metric.change}%
+                        <p className="text-lg font-bold text-gray-900">{formatNumber(metric.production)} kg/h</p>
+                        <p className={`text-sm ${getChangeColor(metric.efficiency - 80)}`}>
+                          {metric.efficiency.toFixed(1)}% efficiency
                         </p>
                       </div>
                     </div>

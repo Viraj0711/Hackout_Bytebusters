@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, CheckCircle, Clock, Zap, Thermometer, Gauge, Wifi, WifiOff, Bell, RefreshCw } from 'lucide-react';
+import { Activity, AlertTriangle, CheckCircle, Clock, Gauge, Wifi, WifiOff, Bell, RefreshCw } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { LoadingSpinner } from '../components/Layout/LoadingSpinner';
 import { useAssets } from '../hooks/useAssets';
@@ -43,7 +43,7 @@ interface AssetStatus {
 
 const RealTimeMonitoring: React.FC = () => {
   const { assets, loading: assetsLoading } = useAssets();
-  const [isConnected, setIsConnected] = useState(true);
+  const [isConnected, _setIsConnected] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d'>('1h');
@@ -194,14 +194,6 @@ const RealTimeMonitoring: React.FC = () => {
     return 'normal';
   };
 
-  const getMetricStatusColor = (status: string) => {
-    switch (status) {
-      case 'critical': return 'text-red-600 bg-red-100';
-      case 'warning': return 'text-yellow-600 bg-yellow-100';
-      default: return 'text-green-600 bg-green-100';
-    }
-  };
-
   const acknowledgeAlert = (alertId: string) => {
     setSystemAlerts(prev => 
       prev.map(alert => 
@@ -254,7 +246,7 @@ const RealTimeMonitoring: React.FC = () => {
                 <label className="text-sm text-gray-600">Time Range:</label>
                 <select
                   value={timeRange}
-                  onChange={(e) => setTimeRange(e.target.value as any)}
+                  onChange={(e) => setTimeRange(e.target.value as '1h' | '6h' | '24h' | '7d')}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   <option value="1h">Last Hour</option>

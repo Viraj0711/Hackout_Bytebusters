@@ -8,8 +8,11 @@ import {
   Clock,
   MapPin
 } from 'lucide-react';
+import { useAssets } from '../hooks/useAssets';
+import DashboardMap from '../components/Map/DashboardMap';
 
 const SafeDashboard = () => {
+  const { assets } = useAssets();
 
   const quickStats = [
     {
@@ -153,37 +156,13 @@ const SafeDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Map Placeholder */}
+            {/* Infrastructure Map */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <MapPin className="w-5 h-5 mr-2 text-blue-500" />
                 Infrastructure Map
               </h3>
-              <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-lg p-8 text-center border-2 border-dashed border-gray-300">
-                <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h4 className="text-lg font-semibold text-gray-700 mb-2">Interactive Map View</h4>
-                <p className="text-gray-500 mb-4">
-                  Visualize hydrogen infrastructure assets across regions
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                  <div className="text-center">
-                    <div className="w-4 h-4 bg-green-500 rounded-full mx-auto mb-1"></div>
-                    <span className="text-xs text-gray-600">Plants (12)</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-4 h-4 bg-blue-500 rounded-full mx-auto mb-1"></div>
-                    <span className="text-xs text-gray-600">Pipelines (8)</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-4 h-4 bg-purple-500 rounded-full mx-auto mb-1"></div>
-                    <span className="text-xs text-gray-600">Storage (5)</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-4 h-4 bg-orange-500 rounded-full mx-auto mb-1"></div>
-                    <span className="text-xs text-gray-600">Hubs (6)</span>
-                  </div>
-                </div>
-              </div>
+              <DashboardMap assets={assets} />
             </div>
 
             {/* Top Performing Assets */}

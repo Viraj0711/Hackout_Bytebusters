@@ -13,11 +13,10 @@ const EnhancedAnalytics: React.FC = () => {
     kpiCards,
     chartData,
     statusData,
-    performanceMetrics,
     loading,
     refreshAnalytics,
-    exportAnalytics,
-    totalGrowth
+    exportData,
+    totalGrowth: _totalGrowth
   } = useAnalytics();
 
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('30d');
@@ -152,7 +151,7 @@ const EnhancedAnalytics: React.FC = () => {
                 <span>Refresh</span>
               </button>
               <button
-                onClick={exportAnalytics}
+                onClick={exportData}
                 className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 <Download className="w-4 h-4" />
@@ -194,17 +193,17 @@ const EnhancedAnalytics: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-600">{card.title}</p>
                       <p className="text-2xl font-bold text-gray-900 mt-1">
-                        {formatNumber(card.value, card.unit)}
+                        {typeof card.value === 'number' ? formatNumber(card.value) : card.value}
                       </p>
                       <div className="flex items-center mt-2">
-                        {getChangeIcon(card.trend)}
-                        <span className={`ml-1 text-sm font-medium ${getChangeColor(card.trend)}`}>
-                          {Math.abs(card.trend)}% vs last period
+                        {typeof card.trend === 'number' ? getChangeIcon(card.trend) : null}
+                        <span className={`ml-1 text-sm font-medium ${typeof card.trend === 'number' ? getChangeColor(card.trend) : 'text-gray-600'}`}>
+                          {typeof card.trend === 'number' ? `${Math.abs(card.trend)}% vs last period` : card.trend}
                         </span>
                       </div>
                     </div>
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${card.bgColor}`}>
-                      <span className={`text-xl ${card.textColor}`}>{card.icon}</span>
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${card.color}`}>
+                      <span className="text-xl text-white">📊</span>
                     </div>
                   </div>
                 </div>

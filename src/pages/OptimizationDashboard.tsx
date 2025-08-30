@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Settings, Zap, Route, Target, TrendingUp, MapPin, Calculator, Download, Play, Pause, RotateCcw } from 'lucide-react';
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { LineChart, Line, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { LoadingSpinner } from '../components/Layout/LoadingSpinner';
 import { useAssets } from '../hooks/useAssets';
 import { notificationService } from '../services/notificationService';
@@ -44,11 +44,11 @@ interface OptimizationResult {
 }
 
 const OptimizationDashboard: React.FC = () => {
-  const { assets, loading: assetsLoading } = useAssets();
-  const [loading, setLoading] = useState(false);
-  const [selectedScenario, setSelectedScenario] = useState<OptimizationScenario | null>(null);
+  const { loading: assetsLoading } = useAssets();
+  const [_loading, setLoading] = useState(false);
+  const [_selectedScenario, setSelectedScenario] = useState<OptimizationScenario | null>(null);
   const [activeTab, setActiveTab] = useState<'scenarios' | 'route' | 'capacity' | 'recommendations'>('scenarios');
-  const [optimizationResults, setOptimizationResults] = useState<OptimizationResult | null>(null);
+  const [_optimizationResults, _setOptimizationResults] = useState<OptimizationResult | null>(null);
   const [isRunningOptimization, setIsRunningOptimization] = useState(false);
 
   // Mock optimization data
@@ -187,7 +187,7 @@ const OptimizationDashboard: React.FC = () => {
       setScenarios(prev => prev.map(s => s.id === scenario.id ? completedScenario : s));
       notificationService.success(`Optimization "${scenario.name}" completed successfully!`);
       
-    } catch (error) {
+    } catch {
       notificationService.error('Optimization failed', 'Please try again or contact support');
     } finally {
       setIsRunningOptimization(false);
@@ -279,7 +279,7 @@ const OptimizationDashboard: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'scenarios' | 'route' | 'capacity' | 'recommendations')}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     activeTab === tab.id
                       ? 'bg-white text-green-600 shadow-sm'
