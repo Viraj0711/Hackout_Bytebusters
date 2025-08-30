@@ -7,6 +7,7 @@ import Landing from './pages/SimpleLanding';
 import SafeDashboard from './pages/SafeDashboard';
 import SimpleAssets from './pages/SimpleAssets';
 import Map from './pages/Map';
+import MapTest from './pages/MapTest';
 import SafeAnalytics from './pages/SafeAnalytics';
 import SafeOptimization from './pages/SafeOptimization';
 import SafeSettings from './pages/SafeSettings';
@@ -28,6 +29,7 @@ function App() {
               <Route path="/analytics" element={<SafeAnalytics />} />
               <Route path="/optimization" element={<SafeOptimization />} />
               <Route path="/map" element={<Map />} />
+              <Route path="/map-test" element={<MapTest />} />
               <Route path="/settings" element={<SafeSettings />} />
               <Route path="/admin" element={<SafeAdmin />} />
               <Route path="/profile" element={<Profile />} />

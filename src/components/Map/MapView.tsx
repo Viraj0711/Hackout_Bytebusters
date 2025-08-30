@@ -5,11 +5,12 @@ import { Asset } from '../../types';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default markers in react-leaflet
-delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
 
 interface MapViewProps {
@@ -92,7 +93,7 @@ function MapClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number
 }
 
 export function MapView({ assets, selectedAsset, onAssetSelect, onMapClick }: MapViewProps) {
-  const mapRef = useRef<L.Map>(null);
+  const mapRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
     if (selectedAsset && mapRef.current) {
@@ -100,22 +101,36 @@ export function MapView({ assets, selectedAsset, onAssetSelect, onMapClick }: Ma
     }
   }, [selectedAsset]);
 
+  // Filter out assets without valid coordinates
+  const validAssets = assets.filter(asset => 
+    asset.latitude && 
+    asset.longitude && 
+    !isNaN(asset.latitude) && 
+    !isNaN(asset.longitude) &&
+    asset.latitude >= -90 && 
+    asset.latitude <= 90 &&
+    asset.longitude >= -180 && 
+    asset.longitude <= 180
+  );
+
   return (
     <div className="h-full w-full relative">
       <MapContainer
-        center={[51.505, -0.09]}
+        center={[20.5937, 78.9629]}
         zoom={6}
         className="h-full w-full"
         ref={mapRef}
+        style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          maxZoom={19}
         />
         
         <MapClickHandler onMapClick={onMapClick} />
 
-        {assets.map((asset) => (
+        {validAssets.map((asset) => (
           <Marker
             key={asset.id}
             position={[asset.latitude, asset.longitude]}
