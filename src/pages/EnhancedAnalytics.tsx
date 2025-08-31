@@ -373,7 +373,18 @@ const EnhancedAnalytics: React.FC = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" domain={[0, 100]} />
                   <YAxis type="category" dataKey="asset" width={150} />
-                  <Tooltip formatter={(value) => `${value}%`} />
+                  <Tooltip 
+                    formatter={(value) => [`${value}%`, 'Utilization']}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      zIndex: 1000
+                    }}
+                    cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+                    position={{ x: undefined, y: undefined }}
+                  />
                   <Bar dataKey="utilization" fill="#3b82f6" />
                 </BarChart>
               </ResponsiveContainer>

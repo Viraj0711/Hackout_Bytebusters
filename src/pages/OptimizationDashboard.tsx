@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Settings, Zap, Route, Target, TrendingUp, MapPin, Calculator, Download, Play, Pause, RotateCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Settings, Zap, Route, Target, TrendingUp, Calculator, Download, Play, Pause, RotateCcw } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { LoadingSpinner } from '../components/Layout/LoadingSpinner';
 import { useAssets } from '../hooks/useAssets';
@@ -45,10 +46,24 @@ interface OptimizationResult {
 
 const OptimizationDashboard: React.FC = () => {
   const { loading: assetsLoading } = useAssets();
+  const navigate = useNavigate();
   const [_loading, setLoading] = useState(false);
   const [_selectedScenario, setSelectedScenario] = useState<OptimizationScenario | null>(null);
   const [activeTab, setActiveTab] = useState<'scenarios' | 'route' | 'capacity' | 'recommendations'>('scenarios');
   const [_optimizationResults, _setOptimizationResults] = useState<OptimizationResult | null>(null);
+  const [selectedFacility, setSelectedFacility] = useState<string | null>(null);
+
+  // Handler for implementing recommendations
+  const handleImplementRecommendation = (title: string) => {
+    notificationService.success(`Implementation plan created for: ${title}`);
+    navigate('/dashboard');
+  };
+
+  // Handler for facility clicks on route map
+  const handleFacilityClick = (facilityId: string, facilityName: string) => {
+    setSelectedFacility(facilityId);
+    notificationService.info(`Selected facility: ${facilityName}`);
+  };
   const [isRunningOptimization, setIsRunningOptimization] = useState(false);
 
   // Mock optimization data
@@ -450,12 +465,208 @@ const OptimizationDashboard: React.FC = () => {
 
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h4 className="font-semibold text-gray-900 mb-4">Route Map Visualization</h4>
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600">Interactive route map</p>
-                    <p className="text-sm text-gray-500">Coming soon</p>
+                <div className="h-64 bg-gray-50 rounded-lg relative overflow-hidden">
+                  <svg width="100%" height="100%" viewBox="0 0 800 256" className="absolute inset-0">
+                    {/* Background grid */}
+                    <defs>
+                      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f3f4f6" strokeWidth="1"/>
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                    
+                    {/* Routes/Pipelines */}
+                    <g stroke="#6b7280" strokeWidth="4" fill="none">
+                      {/* Plant B to Hub 2 */}
+                      <line x1="100" y1="80" x2="200" y2="80" />
+                      {/* Hub 1 to Storage A */}
+                      <line x1="300" y1="60" x2="450" y2="60" />
+                      {/* Hub 2 to Distribution */}
+                      <line x1="500" y1="80" x2="600" y2="80" />
+                      {/* Storage to End Users */}
+                      <line x1="650" y1="80" x2="750" y2="80" />
+                      
+                      {/* Vertical connections */}
+                      <line x1="200" y1="80" x2="250" y2="60" />
+                      <line x1="250" y1="60" x2="300" y2="60" />
+                      <line x1="450" y1="60" x2="500" y2="80" />
+                    </g>
+
+                    {/* Optimized routes overlay */}
+                    <g stroke="#10b981" strokeWidth="6" fill="none" opacity="0.7">
+                      <line x1="100" y1="85" x2="200" y2="85" />
+                      <line x1="300" y1="65" x2="450" y2="65" />
+                      <line x1="500" y1="85" x2="600" y2="85" />
+                      <line x1="650" y1="85" x2="750" y2="85" />
+                      <line x1="200" y1="85" x2="250" y2="65" />
+                      <line x1="250" y1="65" x2="300" y2="65" />
+                      <line x1="450" y1="65" x2="500" y2="85" />
+                    </g>
+
+                    {/* Facilities */}
+                    {[
+                      { id: 'plant-b', x: 80, y: 80, type: 'production', label: 'Plant B', efficiency: 75, optimized: 89 },
+                      { id: 'hub-1', x: 250, y: 60, type: 'hub', label: 'Hub 1', efficiency: 82, optimized: 96 },
+                      { id: 'hub-2', x: 220, y: 80, type: 'hub', label: 'Hub 2', efficiency: 68, optimized: 82 },
+                      { id: 'storage-a', x: 470, y: 60, type: 'storage', label: 'Storage A', efficiency: 85, optimized: 89 },
+                      { id: 'distribution', x: 620, y: 80, type: 'distribution', label: 'Distribution', efficiency: 78, optimized: 95 },
+                      { id: 'end-users', x: 770, y: 80, type: 'endpoint', label: 'End Users', efficiency: 88, optimized: 92 }
+                    ].map((facility) => (
+                      <g key={facility.id}>
+                        {/* Facility background circle */}
+                        <circle 
+                          cx={facility.x} 
+                          cy={facility.y} 
+                          r="25" 
+                          fill={
+                            facility.type === 'production' ? '#ef4444' :
+                            facility.type === 'hub' ? '#3b82f6' :
+                            facility.type === 'storage' ? '#f59e0b' :
+                            facility.type === 'distribution' ? '#8b5cf6' :
+                            '#10b981'
+                          }
+                          stroke={selectedFacility === facility.id ? '#000' : 'none'}
+                          strokeWidth={selectedFacility === facility.id ? '3' : '0'}
+                          className="cursor-pointer hover:opacity-80 transition-all duration-200"
+                          onClick={() => handleFacilityClick(facility.id, facility.label)}
+                        />
+                        
+                        {/* Facility icon */}
+                        <text 
+                          x={facility.x} 
+                          y={facility.y + 5} 
+                          textAnchor="middle" 
+                          className="fill-white text-sm font-bold pointer-events-none"
+                        >
+                          {facility.type === 'production' ? '🏭' :
+                           facility.type === 'hub' ? '🔄' :
+                           facility.type === 'storage' ? '🗃' :
+                           facility.type === 'distribution' ? '📦' : '🏠'}
+                        </text>
+                        
+                        {/* Label */}
+                        <text 
+                          x={facility.x} 
+                          y={facility.y - 35} 
+                          textAnchor="middle" 
+                          className="fill-gray-700 text-xs font-semibold pointer-events-none"
+                        >
+                          {facility.label}
+                        </text>
+                        
+                        {/* Efficiency indicator */}
+                        <text 
+                          x={facility.x} 
+                          y={facility.y + 45} 
+                          textAnchor="middle" 
+                          className="fill-green-600 text-xs font-bold pointer-events-none"
+                        >
+                          +{(facility.optimized - facility.efficiency).toFixed(1)}%
+                        </text>
+                        
+                        <text 
+                          x={facility.x} 
+                          y={facility.y + 58} 
+                          textAnchor="middle" 
+                          className="fill-gray-500 text-xs pointer-events-none"
+                        >
+                          efficiency gain
+                        </text>
+                      </g>
+                    ))}
+
+                    {/* Flow direction arrows */}
+                    {[
+                      { x: 150, y: 75, delay: '0s' }, 
+                      { x: 375, y: 55, delay: '0.5s' }, 
+                      { x: 550, y: 75, delay: '1s' }, 
+                      { x: 700, y: 75, delay: '1.5s' }
+                    ].map((arrow, index) => (
+                      <g key={index}>
+                        <polygon 
+                          points={`${arrow.x},${arrow.y} ${arrow.x + 10},${arrow.y - 5} ${arrow.x + 10},${arrow.y + 5}`}
+                          fill="#10b981"
+                          className="animate-pulse"
+                          style={{ animationDelay: arrow.delay }}
+                        />
+                        {/* Flow particles */}
+                        <circle
+                          cx={arrow.x - 20}
+                          cy={arrow.y}
+                          r="2"
+                          fill="#10b981"
+                          className="animate-ping"
+                          style={{ animationDelay: arrow.delay }}
+                        />
+                      </g>
+                    ))}
+                  </svg>
+                  
+                  {/* Legend */}
+                  <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm rounded-lg p-2 text-xs">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-1">
+                        <div className="w-3 h-1 bg-gray-500"></div>
+                        <span>Current Efficiency %</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-3 h-1 bg-green-500"></div>
+                        <span>Optimized Efficiency %</span>
+                      </div>
+                    </div>
                   </div>
+                  
+                  {/* Facility Details Panel */}
+                  {selectedFacility && (
+                    <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg border max-w-xs">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-semibold text-gray-900">Facility Details</h5>
+                        <button 
+                          onClick={() => setSelectedFacility(null)}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      {(() => {
+                        const facility = [
+                          { id: 'plant-b', label: 'Plant B', type: 'Production Plant', efficiency: 75, optimized: 89, capacity: '2,500 kg/day' },
+                          { id: 'hub-1', label: 'Hub 1', type: 'Distribution Hub', efficiency: 82, optimized: 96, capacity: '1,800 kg/day' },
+                          { id: 'hub-2', label: 'Hub 2', type: 'Distribution Hub', efficiency: 68, optimized: 82, capacity: '1,200 kg/day' },
+                          { id: 'storage-a', label: 'Storage A', type: 'Storage Facility', efficiency: 85, optimized: 89, capacity: '5,000 kg' },
+                          { id: 'distribution', label: 'Distribution', type: 'Distribution Center', efficiency: 78, optimized: 95, capacity: '3,000 kg/day' },
+                          { id: 'end-users', label: 'End Users', type: 'Customer Endpoint', efficiency: 88, optimized: 92, capacity: '1,500 kg/day' }
+                        ].find(f => f.id === selectedFacility);
+                        
+                        return facility ? (
+                          <div className="text-sm space-y-2">
+                            <div>
+                              <span className="font-medium">{facility.label}</span>
+                              <p className="text-gray-600 text-xs">{facility.type}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="flex justify-between">
+                                <span>Current Efficiency:</span>
+                                <span className="font-medium">{facility.efficiency}%</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Optimized Efficiency:</span>
+                                <span className="font-medium text-green-600">{facility.optimized}%</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Improvement:</span>
+                                <span className="font-bold text-green-600">+{(facility.optimized - facility.efficiency).toFixed(1)}%</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Capacity:</span>
+                                <span className="font-medium">{facility.capacity}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })()}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -539,7 +750,10 @@ const OptimizationDashboard: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      <button className="ml-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
+                      <button 
+                        onClick={() => handleImplementRecommendation(rec.title)}
+                        className="ml-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      >
                         Implement
                       </button>
                     </div>

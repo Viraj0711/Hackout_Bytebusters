@@ -8,11 +8,35 @@ import {
   Clock,
   MapPin
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAssets } from '../hooks/useAssets';
 import DashboardMap from '../components/Map/DashboardMap';
 
 const SafeDashboard = () => {
   const { assets } = useAssets();
+  const navigate = useNavigate();
+
+  // Quick Actions handlers
+  const handleAddNewAsset = () => {
+    navigate('/assets');
+    toast.success('Redirecting to Asset Management...');
+  };
+
+  const handleGenerateReport = () => {
+    navigate('/analytics');
+    toast.success('Redirecting to Analytics & Reports...');
+  };
+
+  const handleRunOptimization = () => {
+    navigate('/optimization');
+    toast.success('Redirecting to Optimization Panel...');
+  };
+
+  const handleViewAllAssets = () => {
+    navigate('/assets');
+    toast('Viewing all assets...', { icon: 'ℹ️' });
+  };
 
   const quickStats = [
     {
@@ -242,17 +266,33 @@ const SafeDashboard = () => {
               </div>
               <div className="p-6">
                 <div className="space-y-3">
-                  <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
-                    Add New Asset
+                  <button 
+                    onClick={handleAddNewAsset}
+                    className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Factory className="w-4 h-4" />
+                    <span>Add New Asset</span>
                   </button>
-                  <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                    Generate Report
+                  <button 
+                    onClick={handleGenerateReport}
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Generate Report</span>
                   </button>
-                  <button className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
-                    Run Optimization
+                  <button 
+                    onClick={handleRunOptimization}
+                    className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Fuel className="w-4 h-4" />
+                    <span>Run Optimization</span>
                   </button>
-                  <button className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
-                    View All Assets
+                  <button 
+                    onClick={handleViewAllAssets}
+                    className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Battery className="w-4 h-4" />
+                    <span>View All Assets</span>
                   </button>
                 </div>
               </div>

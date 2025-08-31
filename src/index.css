@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Recharts Tooltip Fix */
+.recharts-tooltip-wrapper {
+  pointer-events: none !important;
+  z-index: 1000 !important;
+}
+
+.recharts-tooltip-cursor {
+  pointer-events: none !important;
+}
+
+/* Ensure tooltips don't get stuck */
+.recharts-surface {
+  overflow: visible !important;
+}
+
 /* Custom map styles */
 .leaflet-container {
   height: 100% !important;
